@@ -9,6 +9,9 @@ public class ShipHandler : MonoBehaviour
     public MoveShip moveShip;
 
     public DockShip dockShip;
+    
+    
+    
     // Update is called once per frame
     void Update()
     {
@@ -23,4 +26,7 @@ public class ShipHandler : MonoBehaviour
         
         moveShip.MoveShipXZ(joyToShip);
     }
+    
+    
+    
 }
