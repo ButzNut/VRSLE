@@ -9,6 +9,7 @@ public class DownForceTrigger : MonoBehaviour
 
     public void OnTriggerStay(Collider other)
     {
+        if(!other.GetComponent<Rigidbody>()) return;
         if (other.CompareTag("MeasureableWeight"))
         {
             other.tag = "DownForce";
@@ -22,6 +23,8 @@ public class DownForceTrigger : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+        if(!other.GetComponent<Rigidbody>()) return;
+
         if (other.CompareTag("MeasureableWeight"))
         {
             other.tag = "DownForce";
@@ -35,6 +38,8 @@ public class DownForceTrigger : MonoBehaviour
 
     private void OnTriggerExit(Collider other)
     {
+        if(!other.GetComponent<Rigidbody>()) return;
+        if(!other.CompareTag("DownForce") && !other.CompareTag("MeasureableWeight")) return;
         other.tag = "MeasureableWeight";
         equalForceScale._impulseDownPerRigidBody.Remove(other.GetComponent<Rigidbody>());
     }

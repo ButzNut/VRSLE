@@ -26,7 +26,6 @@ public class DockShip : MonoBehaviour
             //stop the rigidbody movement
             moveShip.rb.velocity = Vector3.zero;
             docking = true;
-            GameManager.Instance.currentPhase = 2;
         }
     }
 }

@@ -11,6 +11,8 @@ public class UpForceTrigger : MonoBehaviour
     
     private void OnTriggerStay(Collider other)
     {
+        if(!other.GetComponent<Rigidbody>()) return;
+        
         if (other.CompareTag("MeasureableWeight"))
         {
             other.tag = "UpForce";
@@ -29,6 +31,7 @@ public class UpForceTrigger : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+        if(!other.GetComponent<Rigidbody>()) return;
         if (other.CompareTag("MeasureableWeight"))
         {
             other.tag = "UpForce";
@@ -47,6 +50,8 @@ public class UpForceTrigger : MonoBehaviour
 
     private void OnTriggerExit(Collider other)
     {
+        if(!other.GetComponent<Rigidbody>()) return;
+        if(!other.CompareTag("UpForce") && !other.CompareTag("MeasureableWeight")) return;
         other.tag = "MeasureableWeight";
         equalForceScale._impulseUpPerRigidBody.Remove(other.GetComponent<Rigidbody>());
         other.GetComponent<Rigidbody>().useGravity = true;
