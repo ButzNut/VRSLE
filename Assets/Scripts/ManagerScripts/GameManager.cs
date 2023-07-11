@@ -29,6 +29,7 @@ public class GameManager : MonoBehaviour
     bool spawned = false;
     public Transform spaceContainerDestination;
     public RotateLight light1, light2;
+    public AudioSource alarm1, alarm2;
     
     // Start is called before the first frame
     void Awake()
@@ -117,10 +118,12 @@ public class GameManager : MonoBehaviour
     {
         spaceShip.GetComponent<BoxCollider>().isTrigger = true;
         spaceShip.GetComponent<Rigidbody>().isKinematic = true;
+        light1.rotate = true;
+        alarm1.Play();
+        light2.rotate = true;
+        alarm2.Play();
         yield return new WaitForSeconds(5);
         currentPhase = 2;
-        light1.rotate = true;
-        light2.rotate = true;
         if (!spawned)
         {
             spawned = true;
@@ -131,7 +134,9 @@ public class GameManager : MonoBehaviour
         OpenDoors.Instance.openDoors = true;
         yield return new WaitForSeconds(5);
         light1.rotate = false;
+        alarm1.Stop();
         light2.rotate = false;
+        alarm2.Stop();
     }
     
     
