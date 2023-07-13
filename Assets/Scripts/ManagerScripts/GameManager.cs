@@ -7,7 +7,7 @@ using UnityEngine.Video;
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
-    
+
     [Header("Current Game Phase")] public int currentPhase;
 
 
@@ -19,18 +19,24 @@ public class GameManager : MonoBehaviour
 
     [Header("Puzzle 1")] public GameObject puzzle1Hologram;
     [FormerlySerializedAs("starShip")] public GameObject spaceShip;
-    public GameObject shipController;
+    public ShipHandler shipController;
     public GameObject dockingStation;
-    
-    [Header("Puzzle 2")] 
-    public GameObject puzzle2Hologram;
+
+    [Header("Puzzle 2")] public GameObject puzzle2Hologram;
+    public GameObject canvasError;
+    public GameObject canvasSuccess;
+    public DialChange dialChange;
+    public MeshRenderer BatteryStatus;
+
+
+    [Header("Puzzle 3")] public GameObject puzzle3Hologram;
     public GameObject spaceContainer;
     public Transform spaceContainerSpawn;
     bool spawned = false;
     public Transform spaceContainerDestination;
     public RotateLight light1, light2;
     public AudioSource alarm1, alarm2;
-    
+
     // Start is called before the first frame
     void Awake()
     {
@@ -43,9 +49,10 @@ public class GameManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
-        
-        OVRManager.SetSpaceWarp(true); // Enable space warp
+
+        // OVRManager.SetSpaceWarp(true); // Enable space warp
         introductionVideoPlayer.loopPointReached += EndReached;
+        introductionVideoPlayer.prepareCompleted += PrepareCompleted;
     }
 
     // Update is called once per frame
@@ -73,6 +80,9 @@ public class GameManager : MonoBehaviour
             case 2:
                 StartPuzzle2();
                 break;
+            case 3:
+                StartPuzzle3();
+                break;
         }
     }
 
@@ -82,8 +92,9 @@ public class GameManager : MonoBehaviour
 
         if (!introductionVideoPlayer.isPlaying && _timer >= timeToReach)
         {
+            if (introductionVideoPlayer.isPrepared) ;
             introductionVideoPlayer.Play();
-            introductionHologram.SetActive(true);
+            introductionVideoPlayer.Prepare();
             introductionVideoPlayer.loopPointReached += EndReached;
         }
     }
@@ -91,20 +102,38 @@ public class GameManager : MonoBehaviour
     void StartPuzzle1()
     {
         puzzle1Hologram.SetActive(true);
-        shipController.SetActive(true);
-        spaceShip.SetActive(true);
+        shipController.enabled = true;
         dockingStation.SetActive(true);
 
         if (dockingStation.GetComponent<DockShip>().docking)
         {
             StartCoroutine(Puzzle2Starter());
+            puzzle1Hologram.SetActive(false);
         }
     }
-    
-    public void StartPuzzle2()
+
+    void StartPuzzle2()
     {
-        //puzzle1Hologram.SetActive(false);
-        shipController.SetActive(false);
+        float intensity = Mathf.PingPong(Time.time, 1.5f);
+        shipController.enabled = false;
+        BatteryStatus.materials[1].SetColor("_EmissionColor", Color.red * intensity);
+        canvasError.SetActive(true);
+        canvasSuccess.SetActive(false);
+        dialChange.enabled = true;
+        // puzzle2Hologram.SetActive(true);
+    }
+
+    public void StartPuzzle3()
+    {
+        BatteryStatus.materials[1].SetColor("_EmissionColor", new Color(0, 234, 255));
+        canvasError.SetActive(true);
+        canvasSuccess.SetActive(false);
+        dialChange.enabled = true;
+    }
+
+    void PrepareCompleted(VideoPlayer vp)
+    {
+        introductionVideoPlayer.GetComponent<MeshRenderer>().enabled = true;
     }
 
     void EndReached(VideoPlayer vp)
@@ -113,7 +142,7 @@ public class GameManager : MonoBehaviour
         introductionHologram.SetActive(false);
         currentPhase = 1;
     }
-    
+
     IEnumerator Puzzle2Starter()
     {
         spaceShip.GetComponent<BoxCollider>().isTrigger = true;
@@ -123,21 +152,18 @@ public class GameManager : MonoBehaviour
         light2.rotate = true;
         alarm2.Play();
         yield return new WaitForSeconds(5);
-        currentPhase = 2;
         if (!spawned)
         {
             spawned = true;
             spaceContainer = Instantiate(spaceContainer, spaceContainerSpawn.position, Quaternion.identity);
         }
-        
+
         yield return new WaitForSeconds(15);
-        OpenDoors.Instance.openDoors = true;
-        yield return new WaitForSeconds(5);
         light1.rotate = false;
         alarm1.Stop();
         light2.rotate = false;
         alarm2.Stop();
+        yield return new WaitForSeconds(4);
+        currentPhase = 2;
     }
-    
-    
 }
