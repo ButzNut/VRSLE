@@ -8,6 +8,10 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
 
+    [Header("General")] public OcclusionPortal holoPortal;
+    public MeshRenderer holoRenderer;
+    public float alpha = 255;
+
     [Header("Current Game Phase")] public int currentPhase;
 
 
@@ -15,6 +19,7 @@ public class GameManager : MonoBehaviour
     public float timeToReach;
     public GameObject introductionHologram;
     public VideoPlayer introductionVideoPlayer;
+    public AudioSource introductionAudioSource;
 
 
     [Header("Puzzle 1")] public GameObject puzzle1Hologram;
@@ -50,7 +55,9 @@ public class GameManager : MonoBehaviour
             Destroy(gameObject);
         }
 
-        // OVRManager.SetSpaceWarp(true); // Enable space warp
+        OVRManager.SetSpaceWarp(true); // Enable space warp
+        OVRManager.display.displayFrequency = 72.0f; // Set the display refresh rate to 72Hz
+        OVRManager.foveatedRenderingLevel = OVRManager.FoveatedRenderingLevel.Medium; // Enable foveated rendering
         introductionVideoPlayer.loopPointReached += EndReached;
         introductionVideoPlayer.prepareCompleted += PrepareCompleted;
     }
@@ -59,7 +66,6 @@ public class GameManager : MonoBehaviour
     void Update()
     {
         GamePhase();
-
         if (spawned)
         {
             spaceContainer.transform.position = Vector3.MoveTowards(spaceContainer.transform.position,
@@ -69,6 +75,7 @@ public class GameManager : MonoBehaviour
 
     void GamePhase()
     {
+        alpha = Mathf.Clamp(alpha, 0, 255);
         switch (currentPhase)
         {
             case 0:
@@ -92,8 +99,12 @@ public class GameManager : MonoBehaviour
 
         if (!introductionVideoPlayer.isPlaying && _timer >= timeToReach)
         {
-            if (introductionVideoPlayer.isPrepared) ;
-            introductionVideoPlayer.Play();
+            if (introductionVideoPlayer.isPrepared)
+            {
+                introductionVideoPlayer.Play();
+                introductionAudioSource.Play();
+            }
+
             introductionVideoPlayer.Prepare();
             introductionVideoPlayer.loopPointReached += EndReached;
         }
@@ -101,9 +112,18 @@ public class GameManager : MonoBehaviour
 
     void StartPuzzle1()
     {
-        puzzle1Hologram.SetActive(true);
-        shipController.enabled = true;
-        dockingStation.SetActive(true);
+        alpha -= Time.deltaTime * 50;
+        if (alpha > 0)
+        {
+            holoRenderer.material.SetColor("_BaseColor", new Color(1.517f, 1.517f, 1.517f, alpha / 255));
+            holoPortal.open = true;
+        }
+        else
+        {
+            puzzle1Hologram.SetActive(true);
+            shipController.enabled = true;
+            dockingStation.SetActive(true);
+        }
 
         if (dockingStation.GetComponent<DockShip>().docking)
         {
