@@ -67,6 +67,9 @@ public class GameManager : MonoBehaviour
     private int shipPhase;
     public MeshRenderer[] lights;
     public MeshRenderer lightTank;
+    public GameObject CoreStableUI;
+    public GameObject CoreUnstableUI;
+    public bool puzzle4Solved = false;
 
 
     void Awake()
@@ -248,12 +251,31 @@ public class GameManager : MonoBehaviour
 
     public void StartPuzzle4()
     {
-        for (int i = 0; i < lights.Length; i++)
+        if (!puzzle4Solved)
         {
-            lights[i].materials[0].SetColor("_EmissionColor", Color.red * Mathf.PingPong(Time.time, 1f));
-        }
+            for (int i = 0; i < lights.Length; i++)
+            {
+                lights[i].materials[0].SetColor("_EmissionColor", Color.red * Mathf.PingPong(Time.time, 1f));
+            }
 
-        lightTank.materials[0].SetColor("_EmissionColor", Color.red * Mathf.PingPong(Time.time, 0.5f));
+            lightTank.materials[0].SetColor("_EmissionColor", Color.red * Mathf.PingPong(Time.time, 0.5f));
+
+            CoreStableUI.SetActive(false);
+            CoreUnstableUI.SetActive(true);
+        }
+        else
+        {
+            CoreStableUI.SetActive(true);
+            CoreUnstableUI.SetActive(false);
+            
+            for (int i = 0; i < lights.Length; i++)
+            {
+                lights[i].materials[0].SetColor("_EmissionColor", Color.white * 2);
+            }
+
+            lightTank.materials[0].SetColor("_EmissionColor", Color.cyan * 2);
+
+        }
     }
 
     void EndReached(VideoPlayer vp)
@@ -330,7 +352,7 @@ public class GameManager : MonoBehaviour
             p.GetComponent<Rigidbody>().isKinematic = true;
             p.transform.parent = spaceContainer.transform;
         }
-        
+
         yield return new WaitForSeconds(5);
         _spawned = false;
         _containerLoaded = true;
@@ -350,10 +372,10 @@ public class GameManager : MonoBehaviour
         yield return new WaitForSeconds(3);
         light1.rotate = true;
         light2.rotate = true;
-
         MoveStabiliser.Instance.speed = 10;
         boardMessage.clip = boardMessages[3];
         boardMessage.Play();
+        currentPhase = 4;
     }
 
     public void LaunchCapsule()
