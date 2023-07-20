@@ -5,12 +5,14 @@ using UnityEngine;
 
 public class ForceCalculator : MonoBehaviour
 {
-    [SerializeField] private float totalForce;
+    [HideInInspector] public float totalForce;
 
     private Rigidbody rigid;
     public List<Rigidbody> rbDown = new List<Rigidbody>();
     public List<Rigidbody> rbUp = new List<Rigidbody>();
 
+    public bool scaleIsSet;
+    
     public float moveScaleTimer;
 
     public MeshRenderer mesh;
@@ -42,9 +44,13 @@ public class ForceCalculator : MonoBehaviour
             transform.localPosition.y >= 0.95f)
         {
             mesh.material.SetColor("_EmissionColor", Color.green);
+            scaleIsSet = true;
         }
         else
+        {
             mesh.material.SetColor("_EmissionColor", Color.red);
+            scaleIsSet = false;
+        }
     }
 
     void UpdateMass()
@@ -70,11 +76,13 @@ public class ForceCalculator : MonoBehaviour
     {
         if (other.gameObject.CompareTag("DownForce"))
         {
+            if(rbDown.Contains(other.gameObject.GetComponent<Rigidbody>())) return;
             rbDown.Add(other.gameObject.GetComponent<Rigidbody>());
         }
 
         if (other.gameObject.CompareTag("UpForce"))
         {
+            if(rbUp.Contains(other.gameObject.GetComponent<Rigidbody>())) return;
             rbUp.Add(other.gameObject.GetComponent<Rigidbody>());
         }
 
@@ -90,6 +98,8 @@ public class ForceCalculator : MonoBehaviour
 
         if (other.gameObject.CompareTag("UpForce") || other.gameObject.CompareTag("MeasureableWeight"))
         {
+            Rigidbody rb = other.gameObject.GetComponent<Rigidbody>();
+            rb.useGravity = true;
             rbUp.Remove(other.gameObject.GetComponent<Rigidbody>());
         }
 

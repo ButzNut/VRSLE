@@ -11,6 +11,7 @@ TagManager:
   - DownForce
   - Ship
   - Enemy
+  - Scale
   layers:
   - Default
   - TransparentFX

@@ -32,7 +32,7 @@ public class DialChange : MonoBehaviour
     {
         for (int i = 0; i < 20; i++)
         {
-            forceEquations.Add(new ForceEquation(0, UnityEngine.Random.Range(1, 10), UnityEngine.Random.Range(1, 10)));
+            forceEquations.Add(new ForceEquation(0, UnityEngine.Random.Range(1, 7), UnityEngine.Random.Range(1, 7)));
             forceEquations[i].Force = forceEquations[i].CalculateForce();
         }
         
@@ -46,9 +46,9 @@ public class DialChange : MonoBehaviour
 
     private void Update()
     {
-        knob1Value = (int) (knob1.value * 100);
-        knob2Value = (int) (knob2.value * 100);
-        knob3Value = (int) (knob3.value * 100);
+        knob1Value = (int) (knob1.value * 50);
+        knob2Value = (int) (knob2.value * 50);
+        knob3Value = (int) (knob3.value * 50);
         
         equation1.text = shownEquations[0].Mass + " * " + shownEquations[0].Acceleration + " = " + knob1Value;
         equation2.text = shownEquations[1].Mass + " * " + shownEquations[1].Acceleration + " = " + knob2Value;
@@ -64,7 +64,7 @@ public class DialChange : MonoBehaviour
             powerCrystal2.SetActive(true);
             powerCrystal3.SetActive(true);
             GameManager.Instance.currentPhase = 3;
-            OpenDoors.Instance.openDoors = true;
+            GameManager.Instance.StartCoroutine(GameManager.Instance.Puzzle3Starter());
         }
         else
         {
