@@ -71,7 +71,10 @@ public class GameManager : MonoBehaviour
     public GameObject CoreUnstableUI;
     public bool puzzle4Solved = false;
     bool _hologram4Start = false;
-
+    
+    
+    [Header("Final Message")]
+    bool _finalMessageStart = false;
 
     void Awake()
     {
@@ -110,6 +113,8 @@ public class GameManager : MonoBehaviour
     {
         GamePhase();
 
+        if(Input.GetKeyDown(KeyCode.Space))
+            currentPhase++;
         intensity = Mathf.PingPong(Time.time, 1.5f);
 
         if (spaceContainer != null)
@@ -268,6 +273,10 @@ public class GameManager : MonoBehaviour
             lightTank.materials[0].SetColor("_EmissionColor", Color.cyan * 2);
 
             MoveStabiliser.Instance.speed = 0.5f;
+            boardMessage.clip = boardMessages[4];
+            boardMessage.Play();
+
+            StartCoroutine(FinalMessage());
         }
     }
 
@@ -382,6 +391,17 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    IEnumerator FinalMessage()
+    {
+        currentPhase = 5;
+        yield return new WaitForSeconds(5);
+        if (!_finalMessageStart)
+        {
+            GetHologramReady(currentPhase - 1);
+            _finalMessageStart = true;
+        }
+    }
+    
     public void LaunchCapsule()
     {
         if (puzzle3Solved)
