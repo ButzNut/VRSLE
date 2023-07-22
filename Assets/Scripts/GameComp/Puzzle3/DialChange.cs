@@ -64,6 +64,7 @@ public class DialChange : MonoBehaviour
             powerCrystal2.SetActive(true);
             powerCrystal3.SetActive(true);
             GameManager.Instance.currentPhase = 3;
+            GameManager.Instance.puzzle2Solved = true;
             GameManager.Instance.StartCoroutine(GameManager.Instance.Puzzle3Starter());
         }
         else

@@ -70,6 +70,7 @@ public class GameManager : MonoBehaviour
     public GameObject CoreStableUI;
     public GameObject CoreUnstableUI;
     public bool puzzle4Solved = false;
+    bool _hologram4Start = false;
 
 
     void Awake()
@@ -108,11 +109,6 @@ public class GameManager : MonoBehaviour
     void Update()
     {
         GamePhase();
-
-        if (Input.GetKeyDown(KeyCode.A))
-        {
-            StartCoroutine(Puzzle3Starter());
-        }
 
         intensity = Mathf.PingPong(Time.time, 1.5f);
 
@@ -228,11 +224,7 @@ public class GameManager : MonoBehaviour
         canvasError.SetActive(true);
         canvasSuccess.SetActive(false);
         dialChange.enabled = false;
-        if (!_hologram3Start)
-        {
-            GetHologramReady(currentPhase - 1);
-            _hologram3Start = true;
-        }
+
 
         if (forceCalculators.Length < 1)
         {
@@ -267,7 +259,7 @@ public class GameManager : MonoBehaviour
         {
             CoreStableUI.SetActive(true);
             CoreUnstableUI.SetActive(false);
-            
+
             for (int i = 0; i < lights.Length; i++)
             {
                 lights[i].materials[0].SetColor("_EmissionColor", Color.white * 2);
@@ -275,6 +267,7 @@ public class GameManager : MonoBehaviour
 
             lightTank.materials[0].SetColor("_EmissionColor", Color.cyan * 2);
 
+            MoveStabiliser.Instance.speed = 0.5f;
         }
     }
 
@@ -317,7 +310,7 @@ public class GameManager : MonoBehaviour
         yield return new WaitForSeconds(1);
         boardMessage.clip = boardMessages[0];
         boardMessage.Play();
-        yield return new WaitForSeconds(5);
+        yield return new WaitForSeconds(10);
         if (!_hologram2Start)
         {
             GetHologramReady(currentPhase - 1);
@@ -334,7 +327,12 @@ public class GameManager : MonoBehaviour
         OpenDoors.Instance.doorOpenSound.Play();
         OpenDoors.Instance.doorOpenSound2.Play();
         OpenDoors.Instance.openDoors = true;
-        puzzle2Solved = true;
+        yield return new WaitForSeconds(5);
+        if (!_hologram3Start)
+        {
+            GetHologramReady(currentPhase - 1);
+            _hologram3Start = true;
+        }
     }
 
     IEnumerator Puzzle4Starter()
@@ -376,6 +374,12 @@ public class GameManager : MonoBehaviour
         boardMessage.clip = boardMessages[3];
         boardMessage.Play();
         currentPhase = 4;
+        yield return new WaitForSeconds(5);
+        if (!_hologram4Start)
+        {
+            GetHologramReady(currentPhase - 1);
+            _hologram4Start = true;
+        }
     }
 
     public void LaunchCapsule()
